@@ -1,122 +1,61 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-function Jobs() {
-  const [jobs, setJobs] = useState([]);
-  const [file, setFile] = useState(null);
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    axios.get("http://localhost:5000/api/jobs")
-      .then(res => setJobs(res.data))
-      .catch(err => console.log(err));
-  }, []);
-
-  const applyJob = async (jobId) => {
-    const userData = localStorage.getItem("user");
-
-    if (!userData) {
-      alert("Please login first");
-      return;
-    }
-
-    let user;
+  const handleLogin = async () => {
     try {
-      user = JSON.parse(userData);
-    } catch {
-      alert("Session expired, login again");
-      localStorage.clear();
-      return;
-    }
+      const res = await axios.post(
+        "https://smart-job-portal-dleh.onrender.com/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
-    if (!file) {
-      alert("Upload resume first");
-      return;
-    }
+      // Save user in localStorage
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
 
-    const formData = new FormData();
-    formData.append("user_id", user.id);
-    formData.append("job_id", jobId);
-    formData.append("resume", file);
+      alert("Login Success");
 
-    try {
-      await axios.post("http://localhost:5000/api/applications", formData);
-      alert("Applied Successfully");
+      // Redirect to jobs page
+      navigate("/jobs");
     } catch (err) {
       console.log(err);
-      alert("Apply Failed");
+      alert("Login Failed");
     }
   };
 
   return (
-    <div style={styles.container}>
+    <div style={{ padding: "40px" }}>
+      <h2>Smart Job Portal</h2>
 
-      <h2 style={styles.heading}>Available Jobs</h2>
+      <h3>Login</h3>
 
-      {/* Resume Upload */}
-      <div style={styles.uploadBox}>
-        <input 
-          type="file" 
-          onChange={(e) => setFile(e.target.files[0])} 
-        />
-      </div>
+      <input
+        type="email"
+        placeholder="Enter Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <br /><br />
 
-      {/* Job Cards */}
-      <div style={styles.grid}>
-        {jobs.map((job) => (
-          <div key={job.id} style={styles.card}>
-            <h3>{job.title}</h3>
-            <p><b>Company:</b> {job.company}</p>
-            <p><b>Skills:</b> {job.skills_required}</p>
-            <p><b>Match:</b> {job.match}</p>
+      <input
+        type="password"
+        placeholder="Enter Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <br /><br />
 
-            <button 
-              style={styles.button}
-              onClick={() => applyJob(job.id)}
-            >
-              Apply Now
-            </button>
-          </div>
-        ))}
-      </div>
-
+      <button onClick={handleLogin}>Login</button>
     </div>
   );
 }
 
-const styles = {
-  container: {
-    padding: "20px",
-  },
-  heading: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  uploadBox: {
-    textAlign: "center",
-    marginBottom: "20px",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-    gap: "20px",
-  },
-  card: {
-    border: "1px solid #ddd",
-    padding: "15px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-    background: "#fff",
-  },
-  button: {
-    marginTop: "10px",
-    padding: "10px",
-    width: "100%",
-    background: "#007bff",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  }
-};
-
-export default Jobs;
+export default Login;

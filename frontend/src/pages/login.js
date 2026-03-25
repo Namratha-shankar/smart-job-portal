@@ -5,31 +5,26 @@ import { useNavigate } from "react-router-dom";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password
-      });
+      const res = await axios.post(
+        "https://smart-job-portal-dleh.onrender.com/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
 
-      console.log("LOGIN RESPONSE:", res.data);
-
-      // check if user exists
-      if (!res.data.user) {
-        alert("Login Failed");
-        return;
-      }
-
-      // store user safely
+      // Save user in localStorage
       localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
 
       alert("Login Success");
 
+      // Redirect to jobs page
       navigate("/jobs");
-
     } catch (err) {
       console.log(err);
       alert("Login Failed");
@@ -37,12 +32,14 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div style={{ padding: "40px" }}>
+      <h2>Smart Job Portal</h2>
+
+      <h3>Login</h3>
 
       <input
         type="email"
-        placeholder="Email"
+        placeholder="Enter Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -50,7 +47,7 @@ function Login() {
 
       <input
         type="password"
-        placeholder="Password"
+        placeholder="Enter Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
