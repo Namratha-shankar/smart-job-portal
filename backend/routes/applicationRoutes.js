@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { applyJob, getApplications } from "../controllers/applicationController.js.js";
+import { applyJob, getApplications } from "../controllers/applicationController.js";
 
 const router = express.Router();
 
