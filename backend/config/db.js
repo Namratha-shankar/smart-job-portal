@@ -3,17 +3,11 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { Pool } = pkg;
-
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  ssl: {
-    rejectUnauthorized: false
-  }
+const pool = mysql.createPool({
+  host: "localhost",
+  user: "root",
+  password: "Nammu@123", // put your mysql password
+  database: "job_portal",
 });
 
 export default pool;
