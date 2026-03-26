@@ -10,7 +10,7 @@ function Login() {
   const handleLogin = async () => {
     try {
       const res = await axios.post(
-        "https://smart-job-portal-d1eh.onrender.com//api/jobs",
+        "https://smart-job-portal-d1eh.onrender.com/api/jobs",
         {
           email,
           password,

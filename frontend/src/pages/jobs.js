@@ -6,7 +6,7 @@ function Jobs() {
   const [files, setFiles] = useState({}); // store file per job
 
   useEffect(() => {
-    axios.get("https://smart-job-portal-d1eh.onrender.com//api/jobs")
+    axios.get("https://smart-job-portal-d1eh.onrender.com/api/jobs")
       .then(res => setJobs(res.data))
       .catch(err => console.log(err));
   }, []);
@@ -35,7 +35,7 @@ function Jobs() {
       formData.append("job_id", jobId);
       formData.append("user_id", user.id);
 
-      await axios.post("https://smart-job-portal-d1eh.onrender.com//api/applications", formData);
+      await axios.post("https://smart-job-portal-d1eh.onrender.com/api/applications", formData);
 
       alert("Applied Successfully");
     } catch (err) {
