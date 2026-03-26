@@ -1,34 +1,53 @@
 import db from "../config/db.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
+// ✅ REGISTER USER
 export const register = async (req, res) => {
   const { name, email, password, role, skills } = req.body;
 
-  const hashed = await bcrypt.hash(password, 10);
+  try {
+    // check if user already exists
+    const [existingUser] = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
 
-  db.query(
-    "INSERT INTO users (name,email,password,role,skills) VALUES (?,?,?,?,?)",
-    [name, email, hashed, role, skills],
-    (err) => {
-      if (err) return res.status(500).json(err);
-      res.json("User Registered");
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "User already exists" });
     }
-  );
+
+    // insert user (plain password)
+    await db.query(
+      "INSERT INTO users (name, email, password, role, skills) VALUES (?, ?, ?, ?, ?)",
+      [name, email, password, role, skills]
+    );
+
+    res.json({ message: "User registered successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
+  }
 };
 
-export const login = (req, res) => {
+// ✅ LOGIN USER (simple version)
+export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  db.query("SELECT * FROM users WHERE email=?", [email], async (err, data) => {
-    if (err) return res.status(500).json(err);
-    if (data.length === 0) return res.json("User not found");
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM users WHERE email = ? AND password = ?",
+      [email, password]
+    );
 
-    const valid = await bcrypt.compare(password, data[0].password);
-    if (!valid) return res.json("Wrong password");
+    if (rows.length === 0) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
 
-    const token = jwt.sign({ id: data[0].id }, process.env.JWT_SECRET);
-
-    res.json({ token, user: data[0] });
-  });
+    res.json({
+      user: rows[0],
+      token: "dummy-token",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
+  }
 };

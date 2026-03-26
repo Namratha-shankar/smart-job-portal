@@ -10,7 +10,7 @@ function Login() {
   const handleLogin = async () => {
     try {
       const res = await axios.post(
-        "https://smart-job-portal-dleh.onrender.com/api/auth/login",
+        "http://localhost:5000/api/auth/login",
         {
           email,
           password,

@@ -1,23 +1,12 @@
 import express from "express";
 import multer from "multer";
-import { applyJob, getApplications } from "../controllers/applicationController.js";
+import { addApplication } from "../controllers/applicationController.js";
 
 const router = express.Router();
 
-// multer setup
-const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  }
-});
+// store files in uploads folder
+const upload = multer({ dest: "uploads/" });
 
-const upload = multer({ storage });
-
-// APPLY JOB (with file upload)
-router.post("/", upload.single("resume"), applyJob);
-
-// GET ALL APPLICATIONS
-router.get("/", getApplications);
+router.post("/", upload.single("resume"), addApplication);
 
 export default router;
