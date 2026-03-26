@@ -3,8 +3,8 @@ import db from "../config/db.js";
 // ✅ Get all jobs
 export const getJobs = async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM jobs");
-    res.json(rows);
+    const result = await db.query("SELECT * FROM jobs");
+    res.json(result.rows); // ✅ PostgreSQL uses rows
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Server error" });
@@ -18,8 +18,8 @@ export const addJob = async (req, res) => {
 
     const query = `
       INSERT INTO jobs (title, company, skills_required, description)
-      VALUES (?, ?, ?, ?)
-   `;
+      VALUES ($1, $2, $3, $4)
+    `;
 
     await db.query(query, [title, company, skills_required, description]);
 
